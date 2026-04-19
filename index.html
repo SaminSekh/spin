@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spin & Win - Shop Reward System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@500;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-shape bg-shape-a"></div>
+  <div class="bg-shape bg-shape-b"></div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <button id="tabMenuToggle" class="hamburger-btn" aria-expanded="false" aria-controls="tabNav" aria-label="Open menu">☰</button>
+      <p class="shop-name-display" style="padding: 10px;" id="shopNameDisplay">Lucky Shop</p>
+    </header>
+
+    <div class="tab-nav-wrap">
+      <nav id="tabNav" class="tab-nav" aria-label="Main sections">
+        <button type="button" class="tab-btn is-active" data-tab-target="customer-spin" aria-selected="true">Customer Spin</button>
+        <button type="button" class="tab-btn" data-tab-target="settings" aria-selected="false">Settings Panel</button>
+        <button type="button" class="tab-btn" data-tab-target="prizes" aria-selected="false">Prizes</button>
+      </nav>
+    </div>
+
+    <section class="tab-panel is-active" data-tab-panel="customer-spin">
+      <section class="layout">
+        <article class="card spin-card">
+          <h2>Customer Spin</h2>
+          <p class="muted">Enter customer details, spin the wheel, and generate reward record.</p>
+
+          <div class="form-grid">
+            <label>
+              Customer Name
+              <input type="text" id="customerName" placeholder="e.g. Aisyah" />
+            </label>
+            <label>
+              Customer Number
+              <input type="tel" id="customerNumber" placeholder="e.g. +919876543210" />
+            </label>
+            <label>
+              Purchase Amount
+              <input type="number" id="purchaseAmount" placeholder="e.g. 120.00" min="0" step="0.01" />
+            </label>
+          </div>
+
+          <div class="wheel-wrap">
+            <div class="wheel-pointer" aria-hidden="true"></div>
+            <canvas id="wheelCanvas" width="460" height="460"></canvas>
+          </div>
+
+          <div class="action-row">
+            <button id="spinBtn" class="btn btn-primary">Spin</button>
+            <button id="saveBtn" class="btn btn-secondary" disabled>Save to Google Sheets</button>
+            <button id="downloadBtn" class="btn btn-ghost" disabled>Download Coupon</button>
+            <button id="shareBtn" class="btn btn-ghost" disabled>Share WhatsApp</button>
+          </div>
+
+          <p class="status" id="statusText">Ready to spin.</p>
+        </article>
+
+        <article class="card result-card">
+          <h2>Result</h2>
+          <div id="resultEmpty" class="muted">No result yet. Spin to generate a coupon.</div>
+          <div id="resultDetails" class="result-details hidden">
+            <p><strong>Unique ID:</strong> <span id="resultRecordId"></span></p>
+            <p><strong>Shop:</strong> <span id="resultShop"></span></p>
+            <p><strong>Customer:</strong> <span id="resultCustomer"></span></p>
+            <p><strong>Customer Number:</strong> <span id="resultCustomerNumber"></span></p>
+            <p><strong>Amount:</strong> <span id="resultAmount"></span></p>
+            <p><strong>Prize:</strong> <span id="resultPrize"></span></p>
+            <p><strong>Status:</strong> <span id="resultStatus"></span></p>
+            <p><strong>Date & Time:</strong> <span id="resultDate"></span></p>
+            <p><strong>Expiry Date:</strong> <span id="resultExpiry"></span></p>
+          </div>
+
+          <div class="coupon-preview-wrap">
+            <canvas id="couponCanvas" width="960" height="700" aria-label="Coupon image preview"></canvas>
+          </div>
+        </article>
+      </section>
+    </section>
+
+    <section class="card settings-card tab-panel hidden" data-tab-panel="settings">
+      <div class="settings-header">
+        <h2>Settings Panel</h2>
+        <p class="muted">All settings and prizes can be saved to Google Sheets.</p>
+      </div>
+
+      <div class="settings-grid">
+        <label>
+          Shop Name
+          <input type="text" id="shopNameInput" />
+        </label>
+
+        <label>
+          Shop Logo URL
+          <input type="url" id="shopLogoUrlInput" placeholder="https://example.com/logo.png" />
+        </label>
+
+        <label>
+          Prize Expiry (Hours)
+          <input type="number" id="expiryHoursInput" min="0" step="1" />
+        </label>
+
+        <label>
+          Google Apps Script Web App URL
+          <input type="url" id="appsScriptUrlInput" placeholder="https://script.google.com/macros/s/XXXXX/exec" />
+        </label>
+
+        <div class="manual-time-box">
+          <label class="checkbox-label">
+            <input type="checkbox" id="manualDateToggle" />
+            Use manual date/time instead of current time
+          </label>
+          <label>
+            Manual Date & Time
+            <input type="datetime-local" id="manualDateInput" />
+          </label>
+        </div>
+      </div>
+
+      <div class="prize-manager">
+        <div class="prize-manager-header">
+          <h3>Spin Wheel Prize Setup</h3>
+          <button id="addPrizeBtn" class="btn btn-small">Add Prize</button>
+        </div>
+        <div class="table-wrap">
+          <table id="prizeTable">
+            <thead>
+              <tr>
+                <th>Prize Name</th>
+                <th>Probability %</th>
+                <th>Enabled</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="prizeTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="settings-actions">
+        <button id="saveSettingsBtn" class="btn btn-primary">Save Settings</button>
+        <button id="resetDataBtn" class="btn btn-danger">Reset All Local Data</button>
+      </div>
+    </section>
+
+    <section class="card records-card tab-panel hidden" data-tab-panel="prizes">
+      <div class="records-header">
+        <div>
+          <h2>Prizes</h2>
+          <p class="muted">Manage all issued prize records with search, filters, and status updates.</p>
+        </div>
+        <button id="refreshRecordsBtn" class="btn btn-secondary btn-small">Sync From Google Sheets</button>
+      </div>
+
+      <div class="records-controls">
+        <label>
+          Search by Unique ID
+          <input type="text" id="recordSearchInput" placeholder="Type ID for instant search (partial match)" />
+        </label>
+
+        <label>
+          Filter / Sort
+          <select id="recordFilterSortSelect">
+            <option value="recent_old">Recent -> Old</option>
+            <option value="old_recent">Old -> Recent</option>
+            <option value="big_small">Big -> Small (Purchase Amount)</option>
+            <option value="small_big">Small -> Big (Purchase Amount)</option>
+            <option value="completed">Completed</option>
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+            <option value="expired">Expired</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="bulkActionsBar" class="bulk-actions-bar hidden">
+        <label>
+          Bulk Action
+          <select id="bulkActionSelect">
+            <option value="">Select action</option>
+            <option value="completed">Approve / Completed</option>
+            <option value="rejected">Rejected</option>
+            <option value="expired">Expired</option>
+            <option value="pending">Pending</option>
+            <option value="delete">Delete</option>
+          </select>
+        </label>
+        <button id="applyBulkActionBtn" class="btn btn-secondary btn-small" disabled>Apply To Selected</button>
+        <button id="clearSelectionBtn" class="btn btn-ghost btn-small">Clear Selection</button>
+      </div>
+
+      <p id="recordsSummary" class="records-summary">No records yet.</p>
+
+      <div class="records-table-wrap">
+        <table id="recordsTable">
+          <thead>
+            <tr>
+              <th class="centered select-col">
+                <input type="checkbox" id="selectAllRecords" aria-label="Select all visible records" />
+              </th>
+              <th>Unique ID</th>
+              <th>Customer</th>
+              <th>Customer Number</th>
+              <th>Amount</th>
+              <th>Prize</th>
+              <th>Status</th>
+              <th>Date & Time</th>
+              <th>Expiry Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <template id="prizeRowTemplate">
+    <tr>
+      <td><input type="text" class="prize-name-input" placeholder="Prize Name" /></td>
+      <td><input type="number" class="prize-prob-input" min="0" step="0.001" placeholder="e.g. 0.1" /></td>
+      <td class="centered"><input type="checkbox" class="prize-enabled-input" checked /></td>
+      <td class="centered"><button class="btn btn-danger btn-small remove-prize-btn">Remove</button></td>
+    </tr>
+  </template>
+
+  <div id="editModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="true"></div>
+    <div class="modal-panel">
+      <h3>Edit Prize Record</h3>
+      <form id="editRecordForm" class="modal-form">
+        <input type="hidden" id="editRecordId" />
+        <label>
+          Customer Name
+          <input type="text" id="editCustomerName" required />
+        </label>
+        <label>
+          Customer Number
+          <input type="tel" id="editCustomerNumber" />
+        </label>
+        <label>
+          Purchase Amount
+          <input type="number" id="editPurchaseAmount" min="0" step="0.01" required />
+        </label>
+        <label>
+          Prize Won
+          <input type="text" id="editPrizeWon" required />
+        </label>
+        <label>
+          Expiry Date & Time
+          <input type="datetime-local" id="editExpiryDate" required />
+        </label>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" id="cancelEditBtn" class="btn btn-ghost">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
