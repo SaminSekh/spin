@@ -1,4 +1,4 @@
-const SETTINGS_KEY = "spinwin_settings_v1";
+const SETTINGS_KEY = "spinwin_settings_v2";
 const RECORDS_KEY = "spinwin_history_v1";
 const ACTIVE_TAB_KEY = "spinwin_active_tab_v1";
 const APPS_SCRIPT_URL_KEY = "spinwin_apps_script_url_v1";
@@ -1812,7 +1812,7 @@ function mergeSettings(settings) {
   merged.manualDateTime = typeof settings.manualDateTime === "string" ? settings.manualDateTime : "";
   merged.appsScriptUrl = safeText(
     typeof settings.appsScriptUrl === "string" ? settings.appsScriptUrl : "",
-    fallbackAppsScriptUrl
+    merged.appsScriptUrl
   );
   merged.prizes = Array.isArray(settings.prizes) && settings.prizes.length
     ? settings.prizes.map((prize) => ({
@@ -2001,7 +2001,8 @@ function round2(value) {
 }
 
 function safeText(value, fallback = "") {
-  const text = String(value || "").trim();
+  if (value == null) return fallback;
+  const text = String(value).trim();
   return text || fallback;
 }
 
