@@ -14,7 +14,7 @@ const DEFAULT_SETTINGS = {
   expiryHours: 24,
   manualDateEnabled: false,
   manualDateTime: "",
-  appsScriptUrl: "",
+  appsScriptUrl: "https://script.google.com/macros/s/AKfycbzA2JctRESDEOP5fUvopNby3mBAQllfYc6JpzEJNES5BFJj001KRptgZ9FcU-aIX6EfSQ/exec",
   prizes: [
     { id: uid(), name: "10% Discount", probability: 40, enabled: true },
     { id: uid(), name: "Free Drink", probability: 25, enabled: true },
