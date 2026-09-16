@@ -17,7 +17,7 @@ const DEFAULT_SETTINGS = {
   spinDuration: 5,
   manualDateEnabled: false,
   manualDateTime: "",
-  appsScriptUrl: "https://script.google.com/macros/s/AKfycbxSIzCpUu7VCgAOViM7XpsYKQWFTY-Ug5EoiucocVIfw9YniK8JuJcj9FLDwBqRRlTb_w/exec",
+  appsScriptUrl: "https://script.google.com/macros/s/AKfycbyltcB5TcqISvcbIcs3ka3RjaFa1IT8ZxiHDeIA30g01BirlBmnzg2dy7xN0knQAsMAww/exec",
   conditions: [
     {
       id: uid(),
